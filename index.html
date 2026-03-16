@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diffie-Hellman Algo</title>
+</head>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background: #f4f6f9;
+        color: #333;
+        margin: 0;
+        padding: 20px;
+    }
+
+    h1 {
+        text-align: center;
+        color: #2c3e50;
+    }
+
+    label {
+        display: block;
+        margin: 10px 0;
+        font-weight: bold;
+    }
+
+    input {
+        padding: 8px;
+        margin-left: 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        width: 150px;
+    }
+
+    button {
+        margin-top: 15px;
+        padding: 10px 20px;
+        background: #3498db;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: bold;
+    }
+
+    button:hover {
+        background: #2980b9;
+    }
+
+    pre {
+        background: #ecf0f1;
+        padding: 15px;
+        border-radius: 6px;
+        margin-top: 20px;
+        font-size: 14px;
+        border: 1px solid #bdc3c7;
+    }
+
+    #output {
+        background: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        margin-top: 20px;
+        font-size: 15px;
+        border: 1px solid #ccc;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .result-row {
+        margin: 8px 0;
+        padding: 6px;
+        border-bottom: 1px solid #eee;
+    }
+
+    .label {
+        font-weight: bold;
+        color: #2c3e50;
+    }
+
+    .value {
+        color: #16a085;
+        margin-left: 10px;
+    }
+</style>
+
+<body>
+    <h1>Diffie-Hellman Key Exchange Algorithm</h1>
+    <label> Prime (p) : <input id="prime" type="number"></label><br>
+    <label> Generator (p) : <input id="generator" type="number"></label><br>
+    <label> Alice Private Key : <input id="alicekey" type="number"></label><br>
+    <label> Bob Private Key : <input id="bobkey" type="number"></label><br>
+
+
+    <button onclick="runDH()">Compute Public Keys and Shared Secret</button>
+    <pre id="output"></pre>
+    <script>
+        class DiffieHellman {
+            constructor(prime, generator) {
+                this.prime = prime;
+                this.generator = generator;
+            }
+            generatePublicKey(privateKey) {
+                return this.modPow(this.generator, privateKey, this.prime)
+            }
+            generateSharedSecret(publicKey, privateKey) {
+                return this.modPow(publicKey, privateKey, this.prime)
+            }
+
+            modPow(b, e, m) {
+                let r = 1;
+                b = b % m;
+                while (e > 0) {
+                    if (e % 2 === 1) r = (r * b) % m;
+                    e = Math.floor(e / 2);
+                    b = (b * b) % m;
+                }
+                return r;
+            }
+        }
+        function runDH() {
+            const prime = parseInt(document.getElementById("prime").value);
+            const generator = parseInt(document.getElementById("generator").value);
+            const alicePrivateKey = parseInt(document.getElementById("alicekey").value);
+            const bobPrivateKey = parseInt(document.getElementById("bobkey").value);
+
+            const dh = new DiffieHellman(prime, generator);
+
+            const alicePublicKey = dh.generatePublicKey(alicePrivateKey);
+            const bobPublicKey = dh.generatePublicKey(bobPrivateKey);
+
+            const aliceSharedSecret = dh.generateSharedSecret(bobPublicKey, alicePrivateKey);
+            const bobSharedSecret = dh.generateSharedSecret(alicePublicKey, bobPrivateKey);
+
+            const output = `
+            Prime : ${prime};
+            Generator : ${generator};
+            Alice Public Key : ${alicePublicKey};
+            Bob Public Key : ${bobPublicKey};
+            Alice Shared Seceret : ${aliceSharedSecret}
+            Bob Shared Secret : ${bobSharedSecret}
+                ` ;
+            document.getElementById("output").textContent = output;
+
+        }
+    </script>
+
+</body>
+
+</html>
